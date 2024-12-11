@@ -1,6 +1,0 @@
-#ifndef FTHREADPOOL_LIBRARY_H
-#define FTHREADPOOL_LIBRARY_H
-
-void hello();
-
-#endif //FTHREADPOOL_LIBRARY_H

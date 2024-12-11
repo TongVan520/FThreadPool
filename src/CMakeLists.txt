@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.30)
-project(Template)
+project(FThreadPool)
 
 set(CMAKE_CXX_STANDARD 20)
 add_compile_options("/utf-8")
@@ -29,14 +29,28 @@ foreach (file ${head_files})
 endforeach ()
 
 
+set(FSignal_ROOT ${PROJECT_SOURCE_DIR}/../tool/FSignal)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../tool/FSignal/cmake)
+find_package(FSignal REQUIRED)
+
 add_library(
         ${PROJECT_NAME} SHARED register_types.cpp
+        FThreadPool/FThreadPool.cpp
+        FThreadPool/FThreadPool.h
+        FThreadPool/FThreadTask.cpp
+        FThreadPool/FThreadTask.h
+        FThreadPool/FThreadSuspender.cpp
+        FThreadPool/FThreadSuspender.h
 )
-find_package(unofficial-godot-cpp CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE unofficial::godot::cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE FSignal::FSignal-static)
 
 add_library(
         ${PROJECT_NAME}-static STATIC register_types.cpp
+        FThreadPool/FThreadPool.cpp
+        FThreadPool/FThreadPool.h
+        FThreadPool/FThreadTask.cpp
+        FThreadPool/FThreadTask.h
+        FThreadPool/FThreadSuspender.cpp
+        FThreadPool/FThreadSuspender.h
 )
-find_package(unofficial-godot-cpp CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME}-static PRIVATE unofficial::godot::cpp)
+target_link_libraries(${PROJECT_NAME}-static PRIVATE FSignal::FSignal-static)
