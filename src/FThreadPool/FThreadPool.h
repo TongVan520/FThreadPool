@@ -126,6 +126,11 @@ namespace fireflower {
 		/// @返回值 是否有任务
 		bool hasTask(Ref<FThreadTask> task) const;
 		
+		/// @名称 清空任务
+		/// @描述 清空所有尚未被执行的任务\n
+		/// <b>线程安全</b>，<b>原子操作</b>
+		void clearTask();
+		
 		/// @名称 启动线程池
 		/// @描述 <b>线程安全</b>，<b>原子操作</b>
 		void start();
@@ -152,6 +157,11 @@ namespace fireflower {
 		/// @描述 <b>线程安全</b>，<b>原子操作</b>
 		/// @返回值 当前线程数量
 		size_t getThreadCount() const;
+		
+		/// @名称 获取线程池状态
+		/// @描述 <b>线程安全</b>，<b>原子操作</b>
+		/// @返回值 线程池状态
+		FThreadPoolStateEnum getState() const;
 		
 		void setMaxThreadCount(size_t new_count);
 		size_t getMaxThreadCount() const;
