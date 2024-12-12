@@ -98,6 +98,11 @@ namespace fireflower {
 		return this->findTask(task) != this->taskList.end();
 	}
 	
+	void FThreadPool::clearTask() {
+		auto write_lock = unique_lock(this->task_listShrdmtx);
+		this->taskList.clear();
+	}
+	
 	void FThreadPool::start() {
 		if (this->stateEnum != FThreadPoolStateEnum::Stopped) {
 			return;
@@ -155,6 +160,10 @@ namespace fireflower {
 		return this->threadVec.size();
 	}
 	
+	FThreadPool::FThreadPoolStateEnum FThreadPool::getState() const {
+		return this->stateEnum;
+	}
+	
 	void FThreadPool::setMaxThreadCount(size_t new_count) {
 		this->max_thread_count = new_count;
 	}
@@ -195,6 +204,14 @@ namespace fireflower {
 			);
 		}
 		
+		// FThreadPoolStateEnum
+		{
+			BIND_ENUM_CONSTANT(Stopped);
+			BIND_ENUM_CONSTANT(Started);
+			BIND_ENUM_CONSTANT(Paused);
+			BIND_ENUM_CONSTANT(Waiting);
+		}
+		
 		// addTask
 		ClassDB::bind_method(D_METHOD("addTask", "new_task"), &FThreadPool::addTask);
 		
@@ -203,6 +220,9 @@ namespace fireflower {
 		
 		// hasTask
 		ClassDB::bind_method(D_METHOD("hasTask", "task"), &FThreadPool::hasTask);
+		
+		// clearTask
+		ClassDB::bind_method(D_METHOD("clearTask"), &FThreadPool::clearTask);
 		
 		// start
 		ClassDB::bind_method(D_METHOD("start"), &FThreadPool::start);
@@ -221,5 +241,8 @@ namespace fireflower {
 		
 		// getThreadCount
 		ClassDB::bind_method(D_METHOD("getThreadCount"), &FThreadPool::getThreadCount);
+		
+		// getState
+		ClassDB::bind_method(D_METHOD("getState"), &FThreadPool::getState);
 	}
 } // fireflower

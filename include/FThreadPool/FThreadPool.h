@@ -10,22 +10,32 @@
 #include <list>
 #include <thread>
 #include <vector>
-#include <semaphore>
 
 #include <godot_cpp/classes/ref.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
 
 #include "FThreadTask.h"
+#include "FThreadSuspender.h"
+
 #include <FSignal/FSignal.h>
 
-using std::shared_mutex, std::list, std::thread, std::vector, std::mutex, std::binary_semaphore;
+
+#define FRegisterFThreadPool GDREGISTER_CLASS(fireflower::FThreadPool)
+
+#define FRegisterModule_FThreadPool \
+FRegisterModule_FSignal             \
+FRegisterFThreadPool;               \
+FRegisterFThreadTask;               \
+
+
+using std::shared_mutex, std::list, std::thread, std::vector;
 using godot::Ref, godot::RefCounted;
 
 namespace fireflower {
 	/// @类名 线程池
 	/// @描述 可以自动将任务分配到各线程\n
 	/// 没有任务时自动挂起线程
-	class FThreadPool : public RefCounted {
+	class GDE_EXPORT FThreadPool : public RefCounted {
 	GDCLASS(FThreadPool, RefCounted);
 		
 		/// @名称 任务线程主函数
@@ -34,7 +44,7 @@ namespace fireflower {
 	
 	public:
 		/// @类名 线程池状态枚举
-		enum class FThreadPoolStateEnum {
+		enum FThreadPoolStateEnum {
 			/// @名称 已停止
 			Stopped = 0,
 			
@@ -60,15 +70,13 @@ namespace fireflower {
 		/// @名称 线程集合
 		vector <thread> threadVec;
 		
-		/// @名称 线程锁
-		/// @描述 用于挂起线程的锁
-		mutable mutex threadMtx;
+		/// @名称 任务线程挂起器
+		/// @描述 用于在任务列表为空时挂起空闲线程
+		FThreadSuspender taskThrdsus;
 		
-		/// @名称 暂停条件变量
-		/// @描述 用于挂起线程的条件变量
-		condition_variable pauseCdtvar;
-		
-		// condition_variable
+		/// @名称 暂停线程挂起器
+		/// @描述 用于在线程池暂停时挂起线程
+		FThreadSuspender pauseThrdsus;
 		
 		/// @名称 状态
 		/// @描述 <b>注意：确保该成员在其他线程中只读</b>
@@ -118,6 +126,11 @@ namespace fireflower {
 		/// @返回值 是否有任务
 		bool hasTask(Ref<FThreadTask> task) const;
 		
+		/// @名称 清空任务
+		/// @描述 清空所有尚未被执行的任务\n
+		/// <b>线程安全</b>，<b>原子操作</b>
+		void clearTask();
+		
 		/// @名称 启动线程池
 		/// @描述 <b>线程安全</b>，<b>原子操作</b>
 		void start();
@@ -145,10 +158,21 @@ namespace fireflower {
 		/// @返回值 当前线程数量
 		size_t getThreadCount() const;
 		
+		/// @名称 获取线程池状态
+		/// @描述 <b>线程安全</b>，<b>原子操作</b>
+		/// @返回值 线程池状态
+		FThreadPoolStateEnum getState() const;
+		
 		void setMaxThreadCount(size_t new_count);
 		size_t getMaxThreadCount() const;
 		Ref<FSignal1> getMaxThreadCountChangedSignal() const;
+	
+	protected:
+		static void _bind_methods();
+		
 	};
 } // fireflower
+
+VARIANT_ENUM_CAST(fireflower::FThreadPool::FThreadPoolStateEnum);
 
 #endif //FTHREADPOOL_FTHREADPOOL_H
