@@ -1,5 +1,6 @@
 extends Node
 
+@onready var stateLabel := %StateLabel as Label
 @onready var startButton := %StartButton as Button
 @onready var stopButton := %StopButton as Button
 @onready var pauseButton := %PauseButton as Button
@@ -8,6 +9,7 @@ extends Node
 @onready var task_countLabel := %TaskCountLabel as Label
 @onready var add_taskButton := %AddTaskButton as Button
 @onready var remove_taskButton := %RemoveTaskButton as Button
+@onready var clear_taskButton := %ClearTaskButton as Button
 
 @onready var testButton := %TestButton as Button
 @onready var testLabel := %TestLabel as Label
@@ -64,6 +66,14 @@ func connectSignal() -> void:
 			pass
 	)
 	
+	self.clear_taskButton.pressed.connect(
+		func():
+			self.thread_pool.clearTask()
+			self.removeInvalidTask()
+			print("清空任务")
+			pass
+	)
+	
 	self.testButton.pressed.connect(
 		func():
 			# print("测试开始")
@@ -76,6 +86,7 @@ func connectSignal() -> void:
 func _process(_delta: float) -> void:
 	self.updateTaskCount()
 	self.updateTestLabel()
+	self.updateStateLabel()
 	pass
 
 func addTask() -> void:
@@ -128,6 +139,27 @@ func updateTaskCount() -> void:
 
 func updateTestLabel() -> void:
 	self.testLabel.text = str(self.numeberArr)
+	pass
+
+func updateStateLabel() -> void:
+	var textStr := "线程池状态："
+	
+	match self.thread_pool.getState():
+		FThreadPool.FThreadPoolStateEnum.Stopped:
+			textStr += "已停止"
+			pass
+		FThreadPool.FThreadPoolStateEnum.Started:
+			textStr += "已启动"
+			pass
+		FThreadPool.FThreadPoolStateEnum.Paused:
+			textStr += "已暂停"
+			pass
+		FThreadPool.FThreadPoolStateEnum.Waiting:
+			textStr += "等待线程退出"
+			pass
+		pass
+	
+	self.stateLabel.text = textStr
 	pass
 
 func initNumberArray() -> void:

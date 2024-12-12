@@ -10,6 +10,10 @@
 
 #include <FSignal/FSignal.h>
 
+
+#define FRegisterFThreadTask GDREGISTER_CLASS(fireflower::FThreadTask)
+
+
 using godot::RefCounted;
 
 namespace fireflower {
@@ -40,6 +44,13 @@ namespace fireflower {
 		
 		/// @名称 执行任务
 		void execute();
+		
+		Ref<FSignal0> getStartedSignal() const;
+		Ref<FSignal0> getCompletedSignal() const;
+		
+	protected:
+		static void _bind_methods();
+		
 	};
 } // fireflower
 

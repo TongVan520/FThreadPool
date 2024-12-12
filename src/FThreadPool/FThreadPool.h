@@ -44,7 +44,7 @@ namespace fireflower {
 	
 	public:
 		/// @类名 线程池状态枚举
-		enum class FThreadPoolStateEnum {
+		enum FThreadPoolStateEnum {
 			/// @名称 已停止
 			Stopped = 0,
 			
@@ -172,5 +172,7 @@ namespace fireflower {
 		
 	};
 } // fireflower
+
+VARIANT_ENUM_CAST(fireflower::FThreadPool::FThreadPoolStateEnum);
 
 #endif //FTHREADPOOL_FTHREADPOOL_H

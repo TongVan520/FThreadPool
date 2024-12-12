@@ -1,4 +1,4 @@
-set(PackageName Template)
+set(PackageName FThreadPool)
 
 set(${PackageName}_FOUND TRUE)
 message(STATUS "已找到Find${PackageName}.cmake文件！")
